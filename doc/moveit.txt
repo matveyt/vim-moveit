@@ -1,0 +1,36 @@
+*moveit.txt*    Move visual blocks
+
+==============================================================================
+OVERVIEW                                                              *moveit*
+
+Moveit is a very basic plugin which allows moving visually selected block of
+text in any direction.
+
+Note: The result may be affected by some of Vim options, such as
+'virtualedit', 'wrap' or 'whichwrap'.
+
+==============================================================================
+MAPPINGS                                                     *moveit-mappings*
+
+By default the plugin defines the following mappings:
+
+    vnoremap <silent><unique><k4> :call moveit#to(v:count1 . 'h')<CR>
+    vnoremap <silent><unique><k2> :call moveit#to(v:count1 . 'j')<CR>
+    vnoremap <silent><unique><k8> :call moveit#to(v:count1 . 'k')<CR>
+    vnoremap <silent><unique><k6> :call moveit#to(v:count1 . 'l')<CR>
+
+If you don't like these, simply create your own before loading it. The
+defaults will not be used then.
+
+==============================================================================
+FUNCTIONS                                                   *moveit-functions*
+
+                                                                 *moveit#to()*
+[range]moveit#to({motion})
+    Moves last visual selection in a direction specified by {motion} ("h",
+    "j", "k" or "l" prepended by an optional [count]). [range] is silently
+    ignored, so the function can (and normally should) be used in a visual
+    mode.
+
+==============================================================================
+ vim:tw=78:ts=8:noet:ft=help:norl:
