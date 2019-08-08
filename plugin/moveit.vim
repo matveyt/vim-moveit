@@ -1,10 +1,10 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Jul 31
+" Last Change:  2019 Aug 4
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
-if exists('g:loaded_moveit') || &cp || has('nvim')
+if exists('g:loaded_moveit') || &cp
     finish
 endif
 let g:loaded_moveit = 1
