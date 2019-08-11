@@ -1,6 +1,6 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Aug 8
+" Last Change:  2019 Aug 10
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
@@ -8,7 +8,8 @@
 let s:cmd = {'h': "\<BS>", 'j': "gj", 'k': "gk", 'l': "\<Space>"}
 
 function! s:execf(fmt, ...)
-    call execute(call('printf', [a:fmt] + a:000), 'silent!')
+    call execute(repeat('undojoin|', get(b:, 'moveit_undo', -1) == undotree().seq_cur)
+        \ . call('printf', [a:fmt] + a:000), 'silent!')
 endfunction
 
 function! moveit#to(motion) range
@@ -16,53 +17,47 @@ function! moveit#to(motion) range
     let l:mode = visualmode()
     let l:count = max([str2nr(a:motion), 1])
     let l:dir = a:motion[-1:]
-    let l:corner = (l:dir ==# 'h' || l:dir ==# 'k') ? 'o' : ''
-    if empty(l:mode) || stridx('hjkl', l:dir) < 0
+    let l:back = (l:dir ==# 'h' || l:dir ==# 'k')
+    if !&modifiable || empty(l:mode) || stridx('hjkl', l:dir) < 0
         return
     endif
 
-    " join consecutive moves into a single undo
-    if get(b:, 'moveit_undo', -1) == undotree().seq_cur
-        silent! undojoin
-    endif
-
     if l:mode ==# 'V'
-        " 'V' is different as we use :move
-        if empty(l:corner) "down
-            let l:dir = ">+"
-            let l:count = min([l:count, line("$") - line("'>")])
-        else "up
-            let l:dir = "<--"
-            let l:count = min([l:count, line("'<") - 1])
-        endif
-        if l:count > 0
-            call s:execf("'<,'>move '%s%d", l:dir, l:count)
-        else
+        " 'V' is different as we :move
+        let l:dir = l:back ? '<--' : '>+'
+        let l:count = min([l:count, l:back ? a:firstline - 1 : line('$') - a:lastline])
+        if l:count < 1
             normal! gv
             return
         endif
+        call s:execf("'<,'>move '%s%d", l:dir, l:count)
     else
-        " both 'v' and <C-V>
-        " use 'y' to spare 1-9 registers
-        normal! gvy
-        " must extend visual selection over the last char
-        if &sel ==# 'exclusive'
-            let l:corner = s:cmd['l'] . l:corner
+        " delete & move cursor & set marks & put
+        " note: 'y' is used to spare 1-9 regs
+        call s:execf(join(['normal! gvygv"_c', '%d%s', 'm<', 'gP', '%s', "m>\<C-C>"],
+            \ "\<C-\>\<C-O>"), l:count, s:cmd[l:dir],
+            \ &selection ==# 'inclusive' ? s:cmd['h'] : "\<Esc>")
+
+        " adjust '< if there was a virtual offset (e.g. EOL) before 'put'
+        let l:begin = getpos("'<")
+        if l:begin[3]
+            let l:begin[2] += l:begin[3]
+            let l:begin[3] = 0
+            call setpos("'<", l:begin)
         endif
-        " if last char is \n then `] gets on the next line
-        if @@[-1:] ==# "\n"
-            let l:corner = s:cmd['h'] . l:corner
+
+        " trim excessive space
+        if get(g:, 'moveit_trim', 1)
+            let l:begin = max([a:firstline, and(-l:back, line("'>")) + 1])
+            let l:end = min([a:lastline, and(-l:back, a:lastline) + line("'<") - 1])
+            if l:begin <= l:end
+                call s:execf('%s,%ss/\s\+$//', l:begin, l:end)
+            endif
         endif
-        " delete & move cursor & put
-        call s:execf("normal! gv\"_c\<C-\>\<C-O>%d%s\<C-\>\<C-O>m'\<C-\>\<C-O>P\<C-C>",
-            \ l:count, s:cmd[l:dir])
-        " alas, but sometimes we have to adjust `[ too
-        let l:pos = getpos("''")
-        call setpos("'[", [0, l:pos[1], l:pos[2] + l:pos[3], 0])
     endif
 
-    " restore selection
-    call s:execf("normal! `[%s`]%s", l:mode, l:corner)
+    " restore selection (note: 'gv' fails on $-blocks)
+    call s:execf('normal! g`<%sg`>%s', l:mode, l:back ? 'o' : '')
     " remember current undo number
     let b:moveit_undo = undotree().seq_cur
 endfunction

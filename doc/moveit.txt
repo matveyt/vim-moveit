@@ -3,11 +3,15 @@
 ==============================================================================
 OVERVIEW                                                              *moveit*
 
-Moveit is a very basic plugin which allows moving visually selected block of
-text in any direction.
+|Moveit| is a very basic Vim plugin which allows moving visually selected
+block of text in any direction. Thus it is similar to vim-dragvisuals,
+vim-schlepp, vim-move and others. However, |moveit| is designed to support
+different visual modes while honouring current editing options.
 
-Note: The result may be affected by some of Vim options, such as
-'virtualedit', 'wrap' or 'whichwrap'.
+Note: This means the result is actually affected by Vim options, such as
+'virtualedit', 'wrap' or 'whichwrap'. In particular, when moving ^V-$-block
+with 'virtualedit' containing neither "block" nor "all", it may fail to
+reselect properly. This is an expected behaviour.
 
 ==============================================================================
 MAPPINGS                                                     *moveit-mappings*
@@ -28,9 +32,14 @@ FUNCTIONS                                                   *moveit-functions*
                                                                  *moveit#to()*
 [range]moveit#to({motion})
     Moves last visual selection in a direction specified by {motion} ("h",
-    "j", "k" or "l" prepended by an optional [count]). [range] is silently
-    ignored, so the function can (and normally should) be used in a visual
-    mode.
+    "j", "k" or "l" prepended by an optional [count]).
+
+==============================================================================
+VARIABLES                                                   *moveit-variables*
+
+g:moveit_trim                                                  *g:moveit_trim*
+    By default |moveit| trims spaces at end of lines (except the new
+    selection). Set this variable to 0 to keep them intact.
 
 ==============================================================================
  vim:tw=78:ts=8:noet:ft=help:norl:
