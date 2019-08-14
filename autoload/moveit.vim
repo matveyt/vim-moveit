@@ -1,6 +1,6 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Aug 10
+" Last Change:  2019 Aug 12
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
@@ -24,13 +24,12 @@ function! moveit#to(motion) range
 
     if l:mode ==# 'V'
         " 'V' is different as we :move
-        let l:dir = l:back ? '<--' : '>+'
         let l:count = min([l:count, l:back ? a:firstline - 1 : line('$') - a:lastline])
         if l:count < 1
             normal! gv
             return
         endif
-        call s:execf("'<,'>move '%s%d", l:dir, l:count)
+        call s:execf("'<,'>move '%s%d", l:back ? '<--' : '>+', l:count)
     else
         " delete & move cursor & set marks & put
         " note: 'y' is used to spare 1-9 regs
