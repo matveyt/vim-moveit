@@ -1,6 +1,6 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Aug 12
+" Last Change:  2019 Aug 21
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
@@ -9,7 +9,7 @@ let s:cmd = {'h': "\<BS>", 'j': "gj", 'k': "gk", 'l': "\<Space>"}
 
 function! s:execf(fmt, ...)
     call execute(repeat('undojoin|', get(b:, 'moveit_undo', -1) == undotree().seq_cur)
-        \ . call('printf', [a:fmt] + a:000), 'silent!')
+        \ . call('printf', extend([a:fmt], a:000)), 'silent!')
 endfunction
 
 function! moveit#to(motion) range
@@ -29,7 +29,7 @@ function! moveit#to(motion) range
             normal! gv
             return
         endif
-        call s:execf("'<,'>move '%s%d", l:back ? '<--' : '>+', l:count)
+        call s:execf("*move '%s%d", l:back ? '<--' : '>+', l:count)
     else
         " delete & move cursor & set marks & put
         " note: 'y' is used to spare 1-9 regs
@@ -50,7 +50,7 @@ function! moveit#to(motion) range
             let l:begin = max([a:firstline, and(-l:back, line("'>")) + 1])
             let l:end = min([a:lastline, and(-l:back, a:lastline) + line("'<") - 1])
             if l:begin <= l:end
-                call s:execf('%s,%ss/\s\+$//', l:begin, l:end)
+                call s:execf('%d,%ds/\s\+$//', l:begin, l:end)
             endif
         endif
     endif
