@@ -1,6 +1,6 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Aug 21
+" Last Change:  2019 Sep 16
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
@@ -8,7 +8,7 @@
 let s:cmd = {'h': "\<BS>", 'j': "gj", 'k': "gk", 'l': "\<Space>"}
 
 function! s:execf(fmt, ...)
-    call execute(repeat('undojoin|', get(b:, 'moveit_undo', -1) == undotree().seq_cur)
+    return execute(repeat('undojoin|', get(b:, 'moveit_undo', -1) == undotree().seq_cur)
         \ . call('printf', extend([a:fmt], a:000)), 'silent!')
 endfunction
 
