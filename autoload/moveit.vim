@@ -1,14 +1,17 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Sep 16
+" Last Change:  2019 Nov 27
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
+
+let s:save_cpo = &cpo
+set cpo&vim
 
 " allow line wrap
 let s:cmd = {'h': "\<BS>", 'j': "gj", 'k': "gk", 'l': "\<Space>"}
 
-function! s:execf(fmt, ...)
-    return execute(repeat('undojoin|', get(b:, 'moveit_undo', -1) == undotree().seq_cur)
+function s:execf(fmt, ...)
+    return execute(repeat('undojoin|', get(b:, 'moveit_changenr', -1) == changenr())
         \ . call('printf', extend([a:fmt], a:000)), 'silent!')
 endfunction
 
@@ -29,13 +32,13 @@ function! moveit#to(motion) range
             normal! gv
             return
         endif
-        call s:execf("*move '%s%d", l:back ? '<--' : '>+', l:count)
+        call s:execf("'<,'>move '%s%d", l:back ? '<--' : '>+', l:count)
     else
         " delete & move cursor & set marks & put
-        " note: 'y' is used to spare 1-9 regs
-        call s:execf(join(['normal! gvygv"_c', '%d%s', 'm<', 'gP', '%s', "m>\<C-C>"],
+        " Note: 'y' is used to spare 1-9 regs
+        call s:execf(join(['normal! gvygv"_c', '%d%s', 'm<', 'gP', '%s', 'm>'],
             \ "\<C-\>\<C-O>"), l:count, s:cmd[l:dir],
-            \ &selection ==# 'inclusive' ? s:cmd['h'] : "\<Esc>")
+            \ &selection ==# 'inclusive' ? s:cmd.h : "\<Esc>")
 
         " adjust '< if there was a virtual offset (e.g. EOL) before 'put'
         let l:begin = getpos("'<")
@@ -45,18 +48,21 @@ function! moveit#to(motion) range
             call setpos("'<", l:begin)
         endif
 
-        " trim excessive space
+        " trim trailing whitespace
         if get(g:, 'moveit_trim', 1)
             let l:begin = max([a:firstline, and(-l:back, line("'>")) + 1])
             let l:end = min([a:lastline, and(-l:back, a:lastline) + line("'<") - 1])
             if l:begin <= l:end
-                call s:execf('%d,%ds/\s\+$//', l:begin, l:end)
+                call s:execf('keepj keepp %d,%ds/\s\+$//e', l:begin, l:end)
             endif
         endif
     endif
 
     " restore selection (note: 'gv' fails on $-blocks)
     call s:execf('normal! g`<%sg`>%s', l:mode, l:back ? 'o' : '')
-    " remember current undo number
-    let b:moveit_undo = undotree().seq_cur
+    " remember current change number
+    let b:moveit_changenr = changenr()
 endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
