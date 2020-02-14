@@ -18,13 +18,12 @@ MAPPINGS                                                     *moveit-mappings*
 
 By default the plugin defines the following mappings:
 
-    vnoremap <silent><unique><k4> :call moveit#to(v:count1 . 'h')<CR>
-    vnoremap <silent><unique><k2> :call moveit#to(v:count1 . 'j')<CR>
-    vnoremap <silent><unique><k8> :call moveit#to(v:count1 . 'k')<CR>
-    vnoremap <silent><unique><k6> :call moveit#to(v:count1 . 'l')<CR>
+    vnoremap <silent><unique><k4> :call moveit#to(v:count1..'h')<CR>
+    vnoremap <silent><unique><k2> :call moveit#to(v:count1..'j')<CR>
+    vnoremap <silent><unique><k8> :call moveit#to(v:count1..'k')<CR>
+    vnoremap <silent><unique><k6> :call moveit#to(v:count1..'l')<CR>
 
-If you don't like these, simply create your own before loading it. The
-defaults will not be used then.
+Define `g:no_moveit_maps` (or |no_plugin_maps|) to disable them.
 
 ==============================================================================
 FUNCTIONS                                                   *moveit-functions*
