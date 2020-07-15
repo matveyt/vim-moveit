@@ -1,6 +1,6 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2019 Nov 27
+" Last Change:  2020 Jul 15
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
@@ -20,12 +20,12 @@ function! moveit#to(motion) range
     let l:mode = visualmode()
     let l:count = max([str2nr(a:motion), 1])
     let l:dir = a:motion[-1:]
-    let l:back = (l:dir ==# 'h' || l:dir ==# 'k')
+    let l:back = (l:dir is# 'h' || l:dir is# 'k')
     if !&modifiable || empty(l:mode) || stridx('hjkl', l:dir) < 0
         return
     endif
 
-    if l:mode ==# 'V'
+    if l:mode is# 'V'
         " 'V' is different as we :move
         let l:count = min([l:count, l:back ? a:firstline - 1 : line('$') - a:lastline])
         if l:count < 1
@@ -38,7 +38,7 @@ function! moveit#to(motion) range
         " Note: 'y' is used to spare 1-9 regs
         call s:execf(join(['normal! gvygv"_c', '%d%s', 'm<', 'gP', '%s', 'm>'],
             \ "\<C-\>\<C-O>"), l:count, s:cmd[l:dir],
-            \ &selection ==# 'inclusive' ? s:cmd.h : "\<Esc>")
+            \ &selection isnot# 'exclusive' ? s:cmd.h : "\<Esc>")
 
         " adjust '< if there was a virtual offset (e.g. EOL) before 'put'
         let l:begin = getpos("'<")
