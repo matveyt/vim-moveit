@@ -1,6 +1,6 @@
 " Vim plugin for moving blocks of text
 " Maintainer:   matveyt
-" Last Change:  2020 Jul 15
+" Last Change:  2020 Jul 29
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-moveit
 
@@ -10,12 +10,12 @@ set cpo&vim
 " allow line wrap
 let s:cmd = {'h': "\<BS>", 'j': "gj", 'k': "gk", 'l': "\<Space>"}
 
-function s:execf(fmt, ...)
+function s:execf(fmt, ...) abort
     return execute(repeat('undojoin|', get(b:, 'moveit_changenr', -1) == changenr())
         \ . call('printf', extend([a:fmt], a:000)), 'silent!')
 endfunction
 
-function! moveit#to(motion) range
+function! moveit#to(motion) range abort
     " parse input argument
     let l:mode = visualmode()
     let l:count = max([str2nr(a:motion), 1])
