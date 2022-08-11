@@ -1,44 +1,42 @@
-*moveit.txt*    Move visual blocks
+*moveit.txt*	Move visual blocks
 
 ==============================================================================
-OVERVIEW                                                              *moveit*
+OVERVIEW							      *moveit*
 
-|Moveit| is a very basic Vim plugin which allows moving visually selected
-block of text in any direction. Thus it is similar to vim-dragvisuals,
-vim-schlepp, vim-move and others. However, |moveit| is designed to support
-different visual modes while honouring current editing options.
+|Moveit| is a very basic Vim plugin that allows moving visually selected block
+of text in any direction. Thus it is similar to vim-dragvisuals, vim-schlepp,
+vim-move and others. However, |moveit| is designed to support different visual
+modes while honouring current editing options.
 
 Note: This means the result is actually affected by Vim options, such as
 'virtualedit', 'wrap' or 'whichwrap'. In particular, when moving ^V-$-block
 with 'virtualedit' containing neither "block" nor "all", it may fail to
-reselect properly. This is an expected behaviour.
+reselect properly. This is expected.
 
 ==============================================================================
-MAPPINGS                                                     *moveit-mappings*
+MAPPINGS						     *moveit-mappings*
 
-By default the plugin defines the following mappings:
+Ay default the plugin defines these mappings >
 
-    vnoremap <silent><unique><k4> :call moveit#to(v:count1..'h')<CR>
-    vnoremap <silent><unique><k2> :call moveit#to(v:count1..'j')<CR>
-    vnoremap <silent><unique><k8> :call moveit#to(v:count1..'k')<CR>
-    vnoremap <silent><unique><k6> :call moveit#to(v:count1..'l')<CR>
-
-Define `g:no_moveit_maps` (or |no_plugin_maps|) to disable them.
-
+    xnoremap <silent><unique><k4> :call moveit#to(v:count1..'h')<CR>
+    xnoremap <silent><unique><k2> :call moveit#to(v:count1..'j')<CR>
+    xnoremap <silent><unique><k8> :call moveit#to(v:count1..'k')<CR>
+    xnoremap <silent><unique><k6> :call moveit#to(v:count1..'l')<CR>
+<
 ==============================================================================
-FUNCTIONS                                                   *moveit-functions*
+FUNCTIONS						    *moveit-functions*
 
-                                                                 *moveit#to()*
+								 *moveit#to()*
 [range]moveit#to({motion})
-    Moves last visual selection in a direction specified by {motion} ("h",
-    "j", "k" or "l" prepended by an optional [count]).
+    Move last visual selection in a direction specified by {motion}, i.e. "h",
+    "j", "k" or "l" prepended by an optional [count].
 
 ==============================================================================
-VARIABLES                                                   *moveit-variables*
+VARIABLES						    *moveit-variables*
 
-g:moveit_trim                                                  *g:moveit_trim*
-    By default |moveit| trims spaces at end of lines (except the new
-    selection). Set this variable to 0 to keep them intact.
+g:moveit_trim						       *g:moveit_trim*
+    By default |moveit| trims spaces at end of lines, except for a new
+    selection. Set this variable to 0 to keep them as is.
 
 ==============================================================================
  vim:tw=78:ts=8:noet:ft=help:norl:
